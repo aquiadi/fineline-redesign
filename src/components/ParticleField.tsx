@@ -6,16 +6,16 @@ import * as THREE from 'three';
 
 function Particles({ count = 2000 }) {
   const mesh = useRef<THREE.Points>(null!);
-  
+
   const [positions, colors] = useMemo(() => {
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
-    
+
     for (let i = 0; i < count; i++) {
       positions[i * 3] = (Math.random() - 0.5) * 50;
       positions[i * 3 + 1] = (Math.random() - 0.5) * 50;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
-      
+
       // Mix of red and silver particles
       if (Math.random() > 0.85) {
         colors[i * 3] = 0.88;     // R
@@ -28,7 +28,7 @@ function Particles({ count = 2000 }) {
         colors[i * 3 + 2] = gray;
       }
     }
-    
+
     return [positions, colors];
   }, [count]);
 
@@ -36,7 +36,7 @@ function Particles({ count = 2000 }) {
     if (mesh.current) {
       mesh.current.rotation.x = state.clock.elapsedTime * 0.02;
       mesh.current.rotation.y = state.clock.elapsedTime * 0.03;
-      
+
       // Subtle floating motion
       mesh.current.position.y = Math.sin(state.clock.elapsedTime * 0.2) * 0.3;
     }
@@ -47,15 +47,11 @@ function Particles({ count = 2000 }) {
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          count={positions.length / 3}
-          array={positions}
-          itemSize={3}
+          args={[positions, 3]}
         />
         <bufferAttribute
           attach="attributes-color"
-          count={colors.length / 3}
-          array={colors}
-          itemSize={3}
+          args={[colors, 3]}
         />
       </bufferGeometry>
       <pointsMaterial
@@ -80,7 +76,7 @@ function GridFloor() {
 
 function FloatingRing() {
   const ringRef = useRef<THREE.Mesh>(null!);
-  
+
   useFrame((state) => {
     if (ringRef.current) {
       ringRef.current.rotation.x = state.clock.elapsedTime * 0.3;

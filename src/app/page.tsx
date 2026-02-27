@@ -12,11 +12,26 @@ const fadeInUp = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.1, duration: 0.6, ease: 'easeOut' },
+    transition: { delay: i * 0.1, duration: 0.6, ease: 'easeOut' as const },
   }),
 };
 
 const testimonials = [
+  {
+    name: 'Phuong Ngo',
+    text: 'I had deep scratches on my car, and every other body shop told me I\'d need to repaint the whole panel for a really high price. Fine Line Auto Body gave me the most affordable estimate for repaint the whole panel, and they still delivered high quality work. My car looks brand new!',
+    avatar: null,
+  },
+  {
+    name: 'Albert Tam',
+    text: 'Fine Line helped us with repainting our 14 year old Mazda. The end result was amazing! The color is a perfect match with the original shade and the finish has a high quality shine. Very professional team.',
+    avatar: null,
+  },
+  {
+    name: 'OJ Domingues',
+    text: 'Fineline Auto Body in San Bruno is an absolute gem! From start to finish, their service was impeccable. The staff was friendly, knowledgeable, and went above and beyond to ensure my satisfaction. Their attention to detail is unmatched, and I couldn\'t be happier with the results.',
+    avatar: null,
+  },
   {
     name: 'Luanna Cassula',
     text: 'I had a great experience with Fine Line after my car was involved in an accident. They provided excellent service and helped me throughout the process. Their staff was friendly and knowledgeable, and they took care of all the necessary repairs efficiently.',
@@ -31,21 +46,6 @@ const testimonials = [
     name: 'Amanda Elyades',
     text: 'Fine Line is so far the best customer service and body work experience I have had in the Bay Area. Diligently, they took care of my repair and all aspects of my claim worry free and my car was perfect again!',
     avatar: 'https://d2ugbn5gb88fyp.cloudfront.net/1523046/0_0.webp',
-  },
-  {
-    name: 'Karollyne Borges de Souza',
-    text: 'I had an accident a couple months back and was super stressed, took my car to Fineline and they did an amazing job. They took care of everything, have great prices and amazing customer service!!',
-    avatar: 'https://d2ugbn5gb88fyp.cloudfront.net/1523049/0_0.webp',
-  },
-  {
-    name: 'Luana Gr Pantoja',
-    text: 'The best place to fix car dents and paintwork. My car arrived dented like an old car, and left new like a new car. My car is perfect now!!! I always recommend the Fine Line team!',
-    avatar: 'https://d2ugbn5gb88fyp.cloudfront.net/1523052/0_0.webp',
-  },
-  {
-    name: 'Sussu Seguro',
-    text: 'The best service ever, everybody care about me and my car, they know I need my car fixed faster. They also brought my car to my work. Definitely recommend.',
-    avatar: null,
   },
 ];
 

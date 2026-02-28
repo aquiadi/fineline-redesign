@@ -3,8 +3,31 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Wrench, Heart, Zap, ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
+
+interface ContentMap { [key: string]: string; }
 
 export default function AboutPage() {
+    const [about, setAbout] = useState<ContentMap>({});
+    const [mission, setMission] = useState<ContentMap>({});
+    const [loaded, setLoaded] = useState(false);
+
+    useEffect(() => {
+        async function load() {
+            const { data } = await supabase.from('site_content').select('section, key, value').in('section', ['about', 'mission']);
+            const bySection: Record<string, ContentMap> = {};
+            (data || []).forEach((c: { section: string; key: string; value: string }) => {
+                if (!bySection[c.section]) bySection[c.section] = {};
+                bySection[c.section][c.key] = c.value;
+            });
+            setAbout(bySection['about'] || {});
+            setMission(bySection['mission'] || {});
+            setLoaded(true);
+        }
+        load();
+    }, []);
+
     return (
         <>
             {/* Hero Banner */}
@@ -33,68 +56,48 @@ export default function AboutPage() {
             </section>
 
             {/* About Content */}
-            <section className="section">
-                <div className="section-inner">
-                    <div className="about-content-section">
-                        <motion.div
-                            className="about-text"
-                            initial={{ opacity: 0, x: -30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.6 }}
-                            viewport={{ once: true }}
-                        >
-                            <span className="section-tag">Our Story</span>
-                            <h3>About Fine Line Auto Body</h3>
-                            <p>
-                                Fine Line Auto Body, located in San Bruno, CA, is your premier destination for all your
-                                auto body needs. With a commitment to excellence and customer satisfaction, we provide a
-                                comprehensive range of auto body services to keep your vehicle looking its best.
-                            </p>
-                            <p>
-                                Our team specializes in collision repair, auto dent removal service, and auto body repair.
-                                Whether your vehicle has been involved in a major accident or has suffered minor dings and
-                                dents, we have the expertise to restore it to its former glory. We utilize advanced
-                                techniques to ensure precise and efficient repairs every time.
-                            </p>
-                            <p>
-                                In addition to collision repair and dent removal, we offer various other auto body services
-                                to meet your needs. From auto body painting to car repainting and car accident repair, we
-                                have everything you need to enhance the appearance of your vehicle.
-                            </p>
-                            <p>
-                                We understand the importance of clear communication. That&apos;s why we proudly offer services
-                                in Spanish, ensuring that language is never a barrier to getting the auto repairs you need.
-                                We also provide free estimates so you can have all the necessary information before deciding
-                                about your vehicle&apos;s repair.
-                            </p>
-                            <p>
-                                Furthermore, we offer insurance company assistance to help streamline the claims process and
-                                alleviate some of the stress associated with auto repairs. Our team will work directly with
-                                your insurance provider to ensure your claim is handled efficiently and effectively.
-                            </p>
-                        </motion.div>
-                        <motion.div
-                            initial={{ opacity: 0, x: 30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.6 }}
-                            viewport={{ once: true }}
-                        >
-                            <div className="about-image-wrapper" style={{ marginBottom: '2rem' }}>
-                                <img
-                                    src="https://d2ugbn5gb88fyp.cloudfront.net/1523026/0_0.png"
-                                    alt="Professional auto body paint spraying at Fine Line"
-                                />
-                            </div>
-                            <div className="about-image-wrapper">
-                                <img
-                                    src="https://d2ugbn5gb88fyp.cloudfront.net/1523028/0_0.png"
-                                    alt="Completed vehicle repair at Fine Line Auto Body"
-                                />
-                            </div>
-                        </motion.div>
+            {loaded && (
+                <section className="section">
+                    <div className="section-inner">
+                        <div className="about-content-section">
+                            <motion.div
+                                className="about-text"
+                                initial={{ opacity: 0, x: -30 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.6 }}
+                                viewport={{ once: true }}
+                            >
+                                <span className="section-tag">Our Story</span>
+                                <h3>{about.title || 'About Fine Line Auto Body'}</h3>
+                                <p>{about.paragraph_1 || ''}</p>
+                                <p>{about.paragraph_2 || ''}</p>
+                                <p>{about.paragraph_3 || ''}</p>
+                                <p>{about.paragraph_4 || ''}</p>
+                                <p>{about.paragraph_5 || ''}</p>
+                            </motion.div>
+                            <motion.div
+                                initial={{ opacity: 0, x: 30 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.6 }}
+                                viewport={{ once: true }}
+                            >
+                                <div className="about-image-wrapper" style={{ marginBottom: '2rem' }}>
+                                    <img
+                                        src={about.image_1 || 'https://d2ugbn5gb88fyp.cloudfront.net/1523026/0_0.png'}
+                                        alt="Professional auto body paint spraying at Fine Line"
+                                    />
+                                </div>
+                                <div className="about-image-wrapper">
+                                    <img
+                                        src={about.image_2 || 'https://d2ugbn5gb88fyp.cloudfront.net/1523028/0_0.png'}
+                                        alt="Completed vehicle repair at Fine Line Auto Body"
+                                    />
+                                </div>
+                            </motion.div>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
 
             {/* Values */}
             <section className="section" style={{ background: 'var(--bg-secondary)' }}>
@@ -132,7 +135,7 @@ export default function AboutPage() {
                 <div className="section-inner">
                     <div className="section-header">
                         <span className="section-tag">Our Mission</span>
-                        <h2 className="section-title">Driven By Excellence</h2>
+                        <h2 className="section-title">{mission.title || 'Driven By Excellence'}</h2>
                     </div>
                     <motion.div
                         className="mission-content"
@@ -142,9 +145,7 @@ export default function AboutPage() {
                         viewport={{ once: true }}
                     >
                         <blockquote>
-                            Our mission is to deliver fast, flawless repairs that get you back on the road quickly.
-                            Our goal is to minimize downtime and maximize satisfaction, ensuring your car leaves our
-                            shop looking and driving like new.
+                            {mission.quote || 'Our mission is to deliver fast, flawless repairs that get you back on the road quickly.'}
                         </blockquote>
                     </motion.div>
                 </div>

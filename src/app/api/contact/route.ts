@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { saveSubmission } from '@/lib/storage';
 import { sendContactNotification } from '@/lib/mailer';
+import { createServerClient } from '@/lib/supabase';
 
 // Simple in-memory rate limiter
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -108,9 +108,24 @@ export async function POST(request: Request) {
             );
         }
 
-        // 1. Save to JSON file (always works, no external deps)
-        const submission = saveSubmission(sanitizedData);
-        console.log(`✅ Submission ${submission.id} saved`);
+        // 1. Save to Supabase
+        const supabase = createServerClient();
+        const { error: dbError } = await supabase.from('contact_submissions').insert({
+            name: sanitizedData.name,
+            email: sanitizedData.email,
+            phone: sanitizedData.phone,
+            message: sanitizedData.message,
+        });
+
+        if (dbError) {
+            console.error('❌ DB Error:', dbError);
+            return NextResponse.json(
+                { error: 'Something went wrong. Please try again.' },
+                { status: 500 }
+            );
+        }
+
+        console.log('✅ Submission saved to Supabase');
 
         // 2. Send email notification (optional, needs credentials)
         await sendContactNotification(sanitizedData);

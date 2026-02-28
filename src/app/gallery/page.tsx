@@ -1,26 +1,28 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
-const galleryImages = [
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523026/0_0.png', alt: 'Auto body repair work' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523027/0_0.png', alt: 'Vehicle restoration project' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523028/0_0.png', alt: 'Collision repair before and after' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523029/0_0.png', alt: 'Professional paint job result' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523030/0_0.png', alt: 'Dent removal process' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523031/0_0.png', alt: 'Auto body shop workspace' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523032/0_0.png', alt: 'Vehicle repair in progress' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523033/0_0.png', alt: 'Completed auto restoration' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523034/0_0.png', alt: 'Paint booth work' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523035/0_0.jpg', alt: 'Detailed paint matching' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523036/0_0.jpg', alt: 'Body panel repair' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523037/0_0.jpg', alt: 'Frame straightening work' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523038/0_0.jpg', alt: 'Finished vehicle side view' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523039/0_0.jpg', alt: 'Premium finish result' },
-    { src: 'https://d2ugbn5gb88fyp.cloudfront.net/1523019/0_0.png', alt: 'Fine Line Auto Body shop exterior' },
-];
+interface GalleryImage {
+    id: string;
+    src: string;
+    alt: string;
+}
 
 export default function GalleryPage() {
+    const [images, setImages] = useState<GalleryImage[]>([]);
+    const [loaded, setLoaded] = useState(false);
+
+    useEffect(() => {
+        async function load() {
+            const { data } = await supabase.from('gallery_images').select('id, src, alt').eq('is_visible', true).order('sort_order');
+            setImages(data || []);
+            setLoaded(true);
+        }
+        load();
+    }, []);
+
     return (
         <>
             {/* Hero */}
@@ -49,27 +51,29 @@ export default function GalleryPage() {
             </section>
 
             {/* Gallery Grid */}
-            <section className="section">
-                <div className="section-inner">
-                    <div className="gallery-grid">
-                        {galleryImages.map((img, i) => (
-                            <motion.div
-                                key={i}
-                                className="gallery-item"
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: i * 0.05, duration: 0.4 }}
-                                viewport={{ once: true }}
-                            >
-                                <img src={img.src} alt={img.alt} loading="lazy" />
-                                <div className="gallery-overlay">
-                                    <span>{img.alt}</span>
-                                </div>
-                            </motion.div>
-                        ))}
+            {loaded && (
+                <section className="section">
+                    <div className="section-inner">
+                        <div className="gallery-grid">
+                            {images.map((img, i) => (
+                                <motion.div
+                                    key={img.id}
+                                    className="gallery-item"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: i * 0.05, duration: 0.4 }}
+                                    viewport={{ once: true }}
+                                >
+                                    <img src={img.src} alt={img.alt} loading="lazy" />
+                                    <div className="gallery-overlay">
+                                        <span>{img.alt}</span>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
         </>
     );
 }
